@@ -1,0 +1,47 @@
+name: Update country energy data
+
+on:
+  schedule:
+    - cron: "0 6 1 */3 *"   # 06:00 UTC on 1 Jan, Apr, Jul, Oct
+  workflow_dispatch:           # allow manual trigger from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch EMBER grid CO₂ data
+        run: python scripts/fetch_ember.py
+
+      - name: Fetch Eurostat EU energy prices
+        run: python scripts/fetch_eurostat.py
+
+      - name: Fetch EIA US electricity prices
+        run: python scripts/fetch_eia.py
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_KEY }}
+
+      - name: Merge all sources into countries.json
+        run: python scripts/merge_countries.py
+
+      - name: Commit and push if data changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "GitHub Actions"
+          git add data/countries.json data/update_log.json
+          if git diff --staged --quiet; then
+            echo "No data changes detected — skipping commit."
+          else
+            git commit -m "auto: update country energy data ($(date +%Y-%m-%d))"
+            git push
+          fi

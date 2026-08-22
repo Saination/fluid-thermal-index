@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEEI Calculator — Thermal Economic-Environmental Index</title>
+<meta name="description" content="Compare heating sources across cost, carbon, entropy, and time for any fluid and country. Open-source implementation of the TEEI framework.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --surface-1: #f1efe8;
+  --border: #e1e0d9;
+  --border-strong: #cbc9c0;
+  --text-primary: #0b0b0b;
+  --text-secondary: #5c5b56;
+  --text-muted: #898781;
+  --accent: #2a78d6;
+  --accent-bg: #E6F1FB;
+  --radius: 10px;
+  --c-electric: #2a78d6;
+  --c-gas: #eb6834;
+  --c-solar: #1baf7a;
+  --c-hp3: #4a3aa7;
+  --c-hp5: #eda100;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+header { text-align: center; margin-bottom: 2rem; }
+h1 { font-size: 1.7rem; margin: 0 0 0.4rem; }
+.subtitle { color: var(--text-secondary); font-size: 0.95rem; max-width: 620px; margin: 0 auto; }
+.badge-row { display:flex; justify-content:center; gap:8px; margin-top:0.75rem; flex-wrap:wrap; }
+.badge { font-size:11px; padding:3px 9px; border-radius:12px; background:var(--surface-1); color:var(--text-secondary); }
+
+.formula-box {
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid var(--accent);
+}
+.formula-box p { margin: 0.2rem 0; font-size: 13px; }
+.formula-box .title { font-weight: 600; color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+.formula-box .eq { font-family: "SF Mono", Consolas, monospace; font-size: 14px; color: var(--text-primary); }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.panel h2 { font-size: 1rem; margin: 0 0 1rem; color: var(--text-secondary); }
+
+.select-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+.select-group { flex: 1; min-width: 160px; }
+.select-group label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+select, input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+.pill {
+  font-size: 12px; padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border-strong); background: transparent;
+  color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+}
+.pill:hover { background: var(--surface-1); }
+.pill.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+.slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 0.85rem; }
+.slider-row label { font-size: 13px; color: var(--text-secondary); min-width: 150px; flex-shrink:0; }
+.slider-row input[type="range"] { flex: 1; }
+.slider-val { font-size: 13px; font-weight: 600; min-width: 70px; text-align: right; }
+
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 10px; margin: 1rem 0; }
+.metric-card { background: var(--surface-1); border-radius: var(--radius); padding: 0.85rem 1rem; }
+.metric-label { font-size: 11px; color: var(--text-secondary); margin: 0 0 3px; }
+.metric-val { font-size: 20px; font-weight: 600; margin: 0; }
+.metric-unit { font-size: 11px; color: var(--text-muted); margin: 2px 0 0; }
+
+.weight-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.6rem; }
+.weight-row .swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.weight-row label { font-size: 12px; min-width: 90px; flex-shrink: 0; }
+.weight-row .wval { font-size: 12px; font-weight: 600; min-width: 32px; text-align: right; }
+
+table.ranking { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem; }
+table.ranking th { text-align: left; padding: 8px 6px; color: var(--text-secondary); font-weight: 500; border-bottom: 1px solid var(--border-strong); font-size: 11px; text-transform: uppercase; }
+table.ranking td { padding: 8px 6px; border-bottom: 1px solid var(--border); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+
+.policy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.policy-card { background: var(--surface-1); border-radius: var(--radius); padding: 1rem; }
+.policy-card .ptitle { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin: 0 0 6px; }
+.policy-card .pval { font-size: 22px; font-weight: 700; color: var(--accent); margin: 0 0 4px; }
+.policy-card .pnote { font-size: 12px; color: var(--text-secondary); margin: 0; }
+
+.chart-wrap { position: relative; width: 100%; height: 320px; }
+
+footer { text-align: center; margin-top: 2.5rem; font-size: 12px; color: var(--text-muted); }
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+.theorem-box {
+  background: #E1F5EE; border-left: 3px solid #1baf7a;
+  border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+}
+.theorem-box .ttitle { font-size: 12px; font-weight: 700; color: #085041; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+.theorem-box p { font-size: 13px; color: #0F6E56; margin: 0; }
+
+@media (max-width: 640px) {
+  .policy-grid { grid-template-columns: 1fr; }
+  .select-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>TEEI Calculator</h1>
+    <p class="subtitle">Compare heating sources across cost, carbon, entropy, and time — for any fluid, any country.</p>
+    <div class="badge-row">
+      <span class="badge" id="data-updated">Data: loading…</span>
+      <span class="badge">MIT License</span>
+      <span class="badge"><a href="https://github.com/Saination/fluid-thermal-index" style="color:inherit">GitHub ↗</a></span>
+    </div>
+  </header>
+
+  <div class="theorem-box">
+    <p class="ttitle">The cp-invariance theorem</p>
+    <p>All four sub-metrics scale linearly with the fluid's specific heat capacity (cₚ). When normalised for comparison, cₚ cancels exactly — so the <strong>source ranking below is mathematically identical no matter which fluid you pick.</strong> Try switching fluids and watch the ranking order stay the same.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Fluid, source, and country</h2>
+    <div class="select-row">
+      <div class="select-group">
+        <label for="fluid-select">Fluid</label>
+        <select id="fluid-select"></select>
+      </div>
+      <div class="select-group">
+        <label for="country-select">Country</label>
+        <select id="country-select"></select>
+      </div>
+    </div>
+
+    <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;">Heating source (for detailed metrics below)</label>
+    <div class="pill-row" id="source-pills"></div>
+
+    <div class="slider-row">
+      <label for="mass">Mass (kg)</label>
+      <input type="range" id="mass" min="1" max="500000" step="1" value="200" style="flex:1">
+      <span class="slider-val" id="mass-out">200 kg</span>
+    </div>
+    <div class="slider-row">
+      <label for="t-start">Start temp (°C)</label>
+      <input type="range" id="t-start" min="-50" max="90" step="1" value="10">
+      <span class="slider-val" id="t-start-out">10 °C</span>
+    </div>
+    <div class="slider-row">
+      <label for="delta-t">Temperature rise ΔT (°C)</label>
+      <input type="range" id="delta-t" min="1" max="150" step="1" value="50">
+      <span class="slider-val" id="delta-t-out">50 °C</span>
+    </div>
+    <div class="slider-row">
+      <label for="p-rated">Rated power (kW)</label>
+      <input type="range" id="p-rated" min="0.5" max="100" step="0.5" value="3">
+      <span class="slider-val" id="p-rated-out">3.0 kW</span>
+    </div>
+    <div class="slider-row" id="solar-row">
+      <label for="solar-area">Solar area (m²)</label>
+      <input type="range" id="solar-area" min="0.5" max="60" step="0.5" value="4">
+      <span class="slider-val" id="solar-area-out">4.0 m²</span>
+    </div>
+
+    <div id="phase-warning" style="display:none; margin-top:0.75rem; padding:0.6rem 0.9rem; border-radius:8px; background:#FCEBEB; color:#A32D2D; font-size:12.5px;"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Sub-metrics — <span id="selected-source-label">Electric heater</span></h2>
+    <div class="metric-grid">
+      <div class="metric-card"><p class="metric-label">FTEU (economic)</p><p class="metric-val" id="v-fteu" style="color:var(--c-electric)">—</p><p class="metric-unit">¢ / kg·°C</p></div>
+      <div class="metric-card"><p class="metric-label">FTEM (carbon)</p><p class="metric-val" id="v-ftem" style="color:var(--c-solar)">—</p><p class="metric-unit">g CO₂ / kg·°C</p></div>
+      <div class="metric-card"><p class="metric-label">FTES (entropy)</p><p class="metric-val" id="v-ftes" style="color:#e34948">—</p><p class="metric-unit">J / kg·K²</p></div>
+      <div class="metric-card"><p class="metric-label">FTET (time)</p><p class="metric-val" id="v-ftet" style="color:var(--c-hp5)">—</p><p class="metric-unit">s / kg·°C</p></div>
+      <div class="metric-card"><p class="metric-label">Total cost</p><p class="metric-val" id="v-cost">—</p><p class="metric-unit" id="v-cost-sub">€</p></div>
+      <div class="metric-card"><p class="metric-label">Total CO₂</p><p class="metric-val" id="v-co2">—</p><p class="metric-unit" id="v-co2-sub">kg</p></div>
+      <div class="metric-card"><p class="metric-label">Total time</p><p class="metric-val" id="v-time">—</p><p class="metric-unit">for this job</p></div>
+      <div class="metric-card" style="background:var(--accent-bg)"><p class="metric-label" style="color:var(--accent)">cₚ used</p><p class="metric-val" id="v-cp" style="color:var(--accent)">—</p><p class="metric-unit">J/kg·°C</p></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Composite weights</h2>
+    <div class="weight-row"><span class="swatch" style="background:var(--c-electric)"></span><label>Cost</label><input type="range" id="w1" min="0" max="100" value="25" style="flex:1"><span class="wval" id="w1-out">25%</span></div>
+    <div class="weight-row"><span class="swatch" style="background:var(--c-solar)"></span><label>Carbon</label><input type="range" id="w2" min="0" max="100" value="25" style="flex:1"><span class="wval" id="w2-out">25%</span></div>
+    <div class="weight-row"><span class="swatch" style="background:#e34948"></span><label>Entropy</label><input type="range" id="w3" min="0" max="100" value="25" style="flex:1"><span class="wval" id="w3-out">25%</span></div>
+    <div class="weight-row"><span class="swatch" style="background:var(--c-hp5)"></span><label>Speed</label><input type="range" id="w4" min="0" max="100" value="25" style="flex:1"><span class="wval" id="w4-out">25%</span></div>
+  </div>
+
+  <div class="panel">
+    <h2>TEEI ranking — all sources</h2>
+    <div class="chart-wrap"><canvas id="radar-chart"></canvas></div>
+    <table class="ranking">
+      <thead><tr><th>#</th><th>Source</th><th>FTEU</th><th>FTEM</th><th>FTES</th><th>FTET</th><th>TEEI</th></tr></thead>
+      <tbody id="ranking-body"></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Policy scalars</h2>
+    <div class="policy-grid">
+      <div class="policy-card">
+        <p class="ptitle">TPP — Thermal Parity Price</p>
+        <p class="pval" id="tpp-val">—</p>
+        <p class="pnote" id="tpp-note">Electricity price at which a heat pump (COP 3) breaks even with gas.</p>
+      </div>
+      <div class="policy-card">
+        <p class="ptitle">CGIT — Carbon Grid Intensity Threshold</p>
+        <p class="pval" id="cgit-val">—</p>
+        <p class="pnote" id="cgit-note">Grid CO₂ intensity below which resistance heating beats gas on carbon.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Open-source implementation of the TEEI framework · <a href="https://github.com/Saination/fluid-thermal-index">Source on GitHub</a> · MIT License<br>
+    Grid CO₂ data from <a href="https://ember-energy.org">EMBER</a> (CC BY 4.0) · Energy prices from Eurostat and EIA
+  </footer>
+
+</div>
+
+<script>
+// ============================================================================
+// TEEI Calculator — JavaScript port of the teei Python package
+// All formulas mirror teei/metrics.py and teei/_constants.py exactly.
+// ============================================================================
+
+const K1 = 3_600_000;
+const K2 = 36_000;
+const CO2_GAS = 202.0;
+const CO2_SOLAR = 20.0;
+const T_SOURCE = { electric: 500.0, gas: 1200.0, solar: 363.0 };
+const SOLAR_COLLECTOR_EFF = 0.65;
+
+const SOURCE_COLORS = { electric: "#2a78d6", gas: "#eb6834", solar: "#1baf7a", hp3: "#4a3aa7", hp5: "#eda100" };
+const SOURCE_LABELS = { electric: "Electric heater", gas: "Gas boiler", solar: "Solar thermal", hp3: "Heat pump COP 3", hp5: "Heat pump COP 5" };
+const SOURCE_ORDER = ["electric", "gas", "solar", "hp3", "hp5"];
+
+let FLUIDS = {}, SOURCES = {}, COUNTRIES = {};
+let activeFluid = "water", activeCountry = "ES", activeSource = "electric";
+let radarChart = null;
+
+// ── Core metric functions (mirrors teei/metrics.py) ─────────────────────────
+function fteu(price, eta, cp) { return (price / eta) * (cp / K2); }
+function ftem(co2, eta, cp)   { return (co2 / eta) * (cp / K1); }
+
+function ftes(cp, eta, Tf_C, Ts_K, T0_C) {
+  const Tf = Tf_C + 273.15;
+  const T0 = (T0_C !== undefined ? T0_C : Tf_C) + 273.15;
+  if (eta > 1.0) {
+    const beta = eta;
+    return Math.max(0, cp * (1/Tf - (beta-1)/(beta*T0)));
+  } else {
+    const term1 = (cp/eta) * (1/Tf - 1/Ts_K);
+    const term2 = cp * (1/eta - 1) / T0;
+    return Math.max(0, term1 + term2);
+  }
+}
+
+function ftet(cp, P_useful_W) { return cp / P_useful_W; }
+
+function pUseful(sourceId, eta, P_rated_kW, solarArea, solarIrr) {
+  if (sourceId === "solar") return solarArea * solarIrr * SOLAR_COLLECTOR_EFF;
+  return P_rated_kW * 1000 * eta;
+}
+
+function resolveEnergy(sourceId, country) {
+  const src = SOURCES.sources[sourceId];
+  const c = COUNTRIES.countries[country];
+  let price, co2;
+  if (src.co2_type === "gas") { price = c.gas_price; co2 = CO2_GAS; }
+  else if (src.co2_type === "solar") { price = src.default_price_eur_kwh; co2 = CO2_SOLAR; }
+  else { price = c.electricity_price; co2 = c.grid_co2; }
+  return { price, co2 };
+}
+
+function calcSource(sourceId, fluidId, country, mass, deltaT, Tstart, Prated, solarArea, solarIrr) {
+  const cp = FLUIDS.fluids[fluidId].cp;
+  const src = SOURCES.sources[sourceId];
+  const { price, co2 } = resolveEnergy(sourceId, country);
+  const eta = src.efficiency;
+
+  const v_fteu = fteu(price, eta, cp);
+  const v_ftem = ftem(co2, eta, cp);
+  const v_ftes = ftes(cp, eta, Tstart, T_SOURCE[sourceId], Tstart);
+  const Pu = pUseful(sourceId, eta, Prated, solarArea, solarIrr);
+  const v_ftet = ftet(cp, Pu);
+
+  return {
+    fteu: v_fteu, ftem: v_ftem, ftes: v_ftes, ftet: v_ftet,
+    cost_total: v_fteu * mass * deltaT,
+    co2_total: v_ftem * mass * deltaT,
+    t_total: v_ftet * mass * deltaT,
+    cp
+  };
+}
+
+function normalise(arr) {
+  const mn = Math.min(...arr), mx = Math.max(...arr);
+  if (Math.abs(mx-mn) < 1e-12) return arr.map(()=>1.0);
+  return arr.map(v => (v-mn)/(mx-mn));
+}
+function perfScore(n) { return 100*(1-n); }
+
+function computeTEEI(fluidId, country, mass, deltaT, Tstart, Prated, solarArea, solarIrr, weights) {
+  const results = SOURCE_ORDER.map(sid => ({
+    id: sid, ...calcSource(sid, fluidId, country, mass, deltaT, Tstart, Prated, solarArea, solarIrr)
+  }));
+  const nF = normalise(results.map(r=>r.fteu));
+  const nM = normalise(results.map(r=>r.ftem));
+  const nE = normalise(results.map(r=>r.ftes));
+  const nT = normalise(results.map(r=>r.ftet));
+  const [w1,w2,w3,w4] = weights;
+  const wSum = w1+w2+w3+w4 || 1;
+
+  results.forEach((r,i) => {
+    r.perf_fteu = perfScore(nF[i]);
+    r.perf_ftem = perfScore(nM[i]);
+    r.perf_ftes = perfScore(nE[i]);
+    r.perf_ftet = perfScore(nT[i]);
+    r.teei = (w1*r.perf_fteu + w2*r.perf_ftem + w3*r.perf_ftes + w4*r.perf_ftet) / wSum;
+  });
+  results.sort((a,b) => b.teei - a.teei);
+  results.forEach((r,i) => r.rank = i+1);
+  return results;
+}
+
+function tpp(country, cop) {
+  const c = COUNTRIES.countries[country];
+  const etaGas = SOURCES.sources.gas.efficiency;
+  const val = c.gas_price * cop / etaGas;
+  return { tpp: val, hpWins: c.electricity_price < val, elecPrice: c.electricity_price };
+}
+function cgit(cop) {
+  const etaGas = SOURCES.sources.gas.efficiency;
+  return CO2_GAS * cop / etaGas;
+}
+
+// ── Phase check (simplified single-phase validity) ───────────────────────────
+function phaseCheck(fluidId, Tstart, Tend) {
+  const f = FLUIDS.fluids[fluidId];
+  if (!f.T_boil_C) return { valid: true };
+  const limit = 0.85 * f.T_boil_C;
+  if (Tend >= f.T_boil_C) return { valid: false, msg: `Target ${Tend}°C reaches or exceeds boiling point (${f.T_boil_C}°C) — phase change occurs.` };
+  if (Tend > limit) return { valid: false, msg: `Target ${Tend}°C exceeds recommended single-phase limit (${limit.toFixed(1)}°C = 85% of boiling point ${f.T_boil_C}°C).` };
+  return { valid: true };
+}
+
+// ── UI wiring ─────────────────────────────────────────────────────────────────
+function fmtNum(v, d=4) { return v === undefined || v === null || isNaN(v) ? "—" : v.toFixed(d); }
+
+async function loadData() {
+  const [f, s, c] = await Promise.all([
+    fetch("fluids.json").then(r=>r.json()),
+    fetch("sources.json").then(r=>r.json()),
+    fetch("countries.json").then(r=>r.json()),
+  ]);
+  FLUIDS = f; SOURCES = s; COUNTRIES = c;
+  document.getElementById("data-updated").textContent =
+    `Data: ${c._meta.updated || c._meta.version || "static"}`;
+}
+
+function populateSelectors() {
+  const fluidSel = document.getElementById("fluid-select");
+  Object.keys(FLUIDS.fluids).sort().forEach(fid => {
+    const opt = document.createElement("option");
+    opt.value = fid; opt.textContent = `${FLUIDS.fluids[fid].name} (cp=${FLUIDS.fluids[fid].cp})`;
+    fluidSel.appendChild(opt);
+  });
+  fluidSel.value = activeFluid;
+
+  const countrySel = document.getElementById("country-select");
+  Object.keys(COUNTRIES.countries).sort((a,b)=>
+    COUNTRIES.countries[a].name.localeCompare(COUNTRIES.countries[b].name)
+  ).forEach(cc => {
+    const opt = document.createElement("option");
+    opt.value = cc; opt.textContent = COUNTRIES.countries[cc].name;
+    countrySel.appendChild(opt);
+  });
+  countrySel.value = activeCountry;
+
+  const pillRow = document.getElementById("source-pills");
+  SOURCE_ORDER.forEach(sid => {
+    const b = document.createElement("button");
+    b.className = "pill" + (sid === activeSource ? " on" : "");
+    b.textContent = SOURCE_LABELS[sid];
+    b.onclick = () => { activeSource = sid; render(); populateSourcePills(); };
+    pillRow.appendChild(b);
+  });
+}
+
+function populateSourcePills() {
+  document.querySelectorAll("#source-pills .pill").forEach((btn,i) => {
+    btn.classList.toggle("on", SOURCE_ORDER[i] === activeSource);
+  });
+}
+
+function getSliderVals() {
+  return {
+    mass: parseFloat(document.getElementById("mass").value),
+    Tstart: parseFloat(document.getElementById("t-start").value),
+    deltaT: parseFloat(document.getElementById("delta-t").value),
+    Prated: parseFloat(document.getElementById("p-rated").value),
+    solarArea: parseFloat(document.getElementById("solar-area").value),
+    w1: parseFloat(document.getElementById("w1").value),
+    w2: parseFloat(document.getElementById("w2").value),
+    w3: parseFloat(document.getElementById("w3").value),
+    w4: parseFloat(document.getElementById("w4").value),
+  };
+}
+
+function updateSliderLabels(v) {
+  document.getElementById("mass-out").textContent = v.mass >= 1000 ? `${(v.mass/1000).toFixed(1)}k kg` : `${v.mass.toFixed(0)} kg`;
+  document.getElementById("t-start-out").textContent = `${v.Tstart}°C`;
+  document.getElementById("delta-t-out").textContent = `${v.deltaT}°C`;
+  document.getElementById("p-rated-out").textContent = `${v.Prated.toFixed(1)} kW`;
+  document.getElementById("solar-area-out").textContent = `${v.solarArea.toFixed(1)} m²`;
+  const ws = v.w1+v.w2+v.w3+v.w4 || 1;
+  document.getElementById("w1-out").textContent = `${Math.round(v.w1/ws*100)}%`;
+  document.getElementById("w2-out").textContent = `${Math.round(v.w2/ws*100)}%`;
+  document.getElementById("w3-out").textContent = `${Math.round(v.w3/ws*100)}%`;
+  document.getElementById("w4-out").textContent = `${Math.round(v.w4/ws*100)}%`;
+}
+
+function fmtTime(s) {
+  if (s < 60) return `${s.toFixed(1)} s`;
+  if (s < 3600) return `${(s/60).toFixed(1)} min`;
+  if (s < 86400) return `${(s/3600).toFixed(2)} h`;
+  return `${(s/86400).toFixed(1)} d`;
+}
+
+function render() {
+  const v = getSliderVals();
+  updateSliderLabels(v);
+  document.getElementById("solar-row").style.display = activeSource === "solar" ? "flex" : "none";
+
+  const Tend = v.Tstart + v.deltaT;
+  const phase = phaseCheck(activeFluid, v.Tstart, Tend);
+  const warnEl = document.getElementById("phase-warning");
+  if (!phase.valid) {
+    warnEl.style.display = "block";
+    warnEl.textContent = "⚠ " + phase.msg + " TEEI is defined for single-phase sensible heating only.";
+  } else {
+    warnEl.style.display = "none";
+  }
+
+  // Selected-source detail metrics
+  const r = calcSource(activeSource, activeFluid, activeCountry, v.mass, v.deltaT, v.Tstart, v.Prated, v.solarArea, 650.0);
+  document.getElementById("selected-source-label").textContent = SOURCE_LABELS[activeSource];
+  document.getElementById("v-fteu").textContent = fmtNum(r.fteu, 5);
+  document.getElementById("v-ftem").textContent = fmtNum(r.ftem, 4);
+  document.getElementById("v-ftes").textContent = fmtNum(r.ftes, 3);
+  document.getElementById("v-ftet").textContent = fmtNum(r.ftet, 3);
+  document.getElementById("v-cost").textContent = fmtNum(r.cost_total/100, 2);
+  document.getElementById("v-cost-sub").textContent = "€";
+  document.getElementById("v-co2").textContent = fmtNum(r.co2_total/1000, 3);
+  document.getElementById("v-co2-sub").textContent = "kg";
+  document.getElementById("v-time").textContent = fmtTime(r.t_total);
+  document.getElementById("v-cp").textContent = r.cp.toLocaleString();
+
+  // TEEI comparison across all sources
+  const weights = [v.w1, v.w2, v.w3, v.w4];
+  const results = computeTEEI(activeFluid, activeCountry, v.mass, v.deltaT, v.Tstart, v.Prated, v.solarArea, 650.0, weights);
+
+  renderRadar(results);
+  renderRankingTable(results);
+  renderPolicyScalars();
+}
+
+function renderRadar(results) {
+  const ctx = document.getElementById("radar-chart");
+  const isDark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const gridColor = isDark ? "#2c2c2a" : "#e1e0d9";
+  const textColor = isDark ? "#fff" : "#0b0b0b";
+
+  const datasets = results.map(r => ({
+    label: SOURCE_LABELS[r.id],
+    data: [r.perf_fteu, r.perf_ftem, r.perf_ftes, r.perf_ftet],
+    borderColor: SOURCE_COLORS[r.id],
+    backgroundColor: SOURCE_COLORS[r.id] + (r.id === activeSource ? "33" : "14"),
+    pointBackgroundColor: SOURCE_COLORS[r.id],
+    pointRadius: r.id === activeSource ? 6 : 3,
+    borderWidth: r.id === activeSource ? 2.5 : 1,
+  }));
+
+  if (radarChart) radarChart.destroy();
+  radarChart = new Chart(ctx, {
+    type: "radar",
+    data: { labels: ["Cost", "Carbon", "Entropy", "Speed"], datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom", labels: { color: textColor, font: {size: 11} } },
+        tooltip: { callbacks: { label: (c) => `${c.dataset.label} — ${["Cost","Carbon","Entropy","Speed"][c.dataIndex]}: ${Math.round(c.raw)}/100` } }
+      },
+      scales: { r: { min:0, max:100, ticks:{stepSize:25, color:"#898781", backdropColor:"transparent"},
+                     grid:{color:gridColor}, pointLabels:{color:textColor, font:{size:12,weight:"500"}},
+                     angleLines:{color:gridColor} } }
+    }
+  });
+}
+
+function renderRankingTable(results) {
+  const body = document.getElementById("ranking-body");
+  body.innerHTML = "";
+  results.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.rank}</td>
+      <td><span class="dot" style="background:${SOURCE_COLORS[r.id]}"></span>${SOURCE_LABELS[r.id]}</td>
+      <td>${fmtNum(r.fteu,5)}</td>
+      <td>${fmtNum(r.ftem,4)}</td>
+      <td>${fmtNum(r.ftes,3)}</td>
+      <td>${fmtNum(r.ftet,3)}</td>
+      <td style="font-weight:700;color:var(--accent)">${r.teei.toFixed(1)}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function renderPolicyScalars() {
+  const t3 = tpp(activeCountry, 3.0);
+  document.getElementById("tpp-val").textContent = `€${t3.tpp.toFixed(3)}/kWh`;
+  document.getElementById("tpp-note").innerHTML =
+    `Local electricity: €${t3.elecPrice.toFixed(3)}/kWh → ` +
+    (t3.hpWins ? `<strong style="color:#1baf7a">heat pump wins ✓</strong>` : `<strong style="color:#eb6834">gas wins</strong>`);
+
+  const cg = cgit(1.0);
+  const gridCO2 = COUNTRIES.countries[activeCountry].grid_co2;
+  document.getElementById("cgit-val").textContent = `${cg.toFixed(0)} g/kWh`;
+  document.getElementById("cgit-note").innerHTML =
+    `Local grid: ${gridCO2} g/kWh → ` +
+    (gridCO2 < cg ? `<strong style="color:#1baf7a">should electrify ✓</strong>` : `<strong style="color:#eb6834">gas wins on carbon</strong>`);
+}
+
+async function init() {
+  await loadData();
+  populateSelectors();
+
+  document.getElementById("fluid-select").addEventListener("change", e => { activeFluid = e.target.value; render(); });
+  document.getElementById("country-select").addEventListener("change", e => { activeCountry = e.target.value; render(); });
+
+  ["mass","t-start","delta-t","p-rated","solar-area","w1","w2","w3","w4"].forEach(id => {
+    document.getElementById(id).addEventListener("input", render);
+  });
+
+  render();
+}
+
+init();
+</script>
+</body>
+</html>

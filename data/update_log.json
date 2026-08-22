@@ -1,0 +1,11 @@
+{
+  "history": [
+    {
+      "date": "2026-08-19T00:00:00+00:00",
+      "version": "2026-Q3",
+      "changes": [],
+      "changes_count": 0,
+      "note": "Initial static dataset — automated pipeline not yet run"
+    }
+  ]
+}

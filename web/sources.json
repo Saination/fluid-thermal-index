@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "description": "Heating source parameter database for TEEI framework",
+    "version": "0.1",
+    "note": "Default values for Spain 2026. Country-specific prices loaded from countries.json."
+  },
+  "sources": {
+    "electric": {
+      "name": "Electric resistance heater",
+      "efficiency": 0.99,
+      "is_cop": false,
+      "co2_type": "grid",
+      "T_source_K": 500.0,
+      "default_price_eur_kwh": 0.190,
+      "default_P_rated_kW": 2.0,
+      "note": "Converts ~99% of electrical energy to heat. T_source=500K (element surface)."
+    },
+    "gas": {
+      "name": "Gas stove / boiler",
+      "efficiency": 0.45,
+      "is_cop": false,
+      "co2_type": "gas",
+      "T_source_K": 1200.0,
+      "default_price_eur_kwh": 0.092,
+      "default_P_rated_kW": 2.0,
+      "note": "45% of gas energy reaches fluid. T_source=1200K (effective flame temp)."
+    },
+    "solar": {
+      "name": "Solar flat-plate thermal",
+      "efficiency": 1.0,
+      "is_cop": false,
+      "co2_type": "solar",
+      "T_source_K": 363.0,
+      "default_price_eur_kwh": 0.067,
+      "default_P_rated_kW": null,
+      "default_solar_area_m2": 2.5,
+      "default_irradiance_W_m2": 800.0,
+      "note": "Price is amortised LCOE. Power calculated from area x irradiance x 0.65."
+    },
+    "hp3": {
+      "name": "Heat pump COP 3",
+      "efficiency": 3.0,
+      "is_cop": true,
+      "co2_type": "grid",
+      "T_source_K": null,
+      "default_price_eur_kwh": 0.190,
+      "default_P_rated_kW": 2.0,
+      "note": "COP=3: delivers 3 kWh heat per 1 kWh electrical input. FTES uses Model B."
+    },
+    "hp5": {
+      "name": "Heat pump COP 5",
+      "efficiency": 5.0,
+      "is_cop": true,
+      "co2_type": "grid",
+      "T_source_K": null,
+      "default_price_eur_kwh": 0.190,
+      "default_P_rated_kW": 2.0,
+      "note": "High-efficiency heat pump. FTES uses Model B."
+    }
+  }
+}

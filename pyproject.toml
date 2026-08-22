@@ -1,0 +1,82 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "teei"
+version = "0.1.0"
+description = "Thermal Economic-Environmental Index — a fluid-parameterised multi-dimensional framework for comparing heating sources"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+keywords = [
+    "thermal", "heating", "energy", "economics",
+    "entropy", "specific heat", "LCOH", "heat pump",
+    "decarbonisation", "TEEI", "techno-economic"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+# Pure Python — no mandatory dependencies for v0.1
+dependencies = []
+
+[project.optional-dependencies]
+# For accurate c_p,eff via numerical integration (eq. 3 in formulation doc)
+coolprop = ["CoolProp>=6.4"]
+# For tabular output from compare()
+pandas = ["pandas>=1.5"]
+# For array-valued inputs to metric functions
+numpy = ["numpy>=1.23"]
+# Development and testing
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1",
+]
+# Everything
+all = ["teei[coolprop,pandas,numpy,dev]"]
+
+[project.urls]
+Homepage       = "https://github.com/teei-project/fluid-thermal-index"
+Documentation  = "https://teei-project.github.io/fluid-thermal-index/"
+Repository     = "https://github.com/teei-project/fluid-thermal-index"
+"Bug Tracker"  = "https://github.com/teei-project/fluid-thermal-index/issues"
+"Paper (preprint)" = "https://doi.org/10.0000/PLACEHOLDER"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["teei*"]
+
+[tool.setuptools.package-data]
+teei = ["../data/*.json"]
+
+# ---------------------------------------------------------------------------
+# Pytest configuration
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths    = ["tests"]
+addopts      = "-v --tb=short"
+filterwarnings = [
+    "ignore::UserWarning",   # suppress cp-variation warnings during tests
+]
+
+# ---------------------------------------------------------------------------
+# Ruff linter configuration
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length    = 90
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E501"]   # line length handled by formatter

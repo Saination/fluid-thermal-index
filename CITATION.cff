@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "fluid-thermal-index: TEEI — Thermal Economic-Environmental Index"
+version: 0.1.0
+date-released: "2026-XX-XX"
+license: MIT
+repository-code: "https://github.com/Saination/fluid-thermal-index"
+url: "https://Saination.github.io/fluid-thermal-index/"
+abstract: >
+  TEEI (Thermal Economic-Environmental Index) is a fluid-parameterised,
+  multi-dimensional framework for comparing heating sources across economic,
+  environmental, thermodynamic, and temporal dimensions. The package proves
+  the cp-invariance theorem: TEEI source rankings are mathematically
+  independent of which fluid is being heated.
+keywords:
+  - thermal economics
+  - heat pump
+  - specific heat capacity
+  - levelized cost of heat
+  - cp-invariance
+  - TEEI
+  - entropy generation
+authors:
+  - family-names: "[SURNAME]"
+    given-names: "[FIRST NAME]"
+    affiliation: "[INSTITUTION]"
+    orcid: "https://orcid.org/[ORCID-ID]"
+preferred-citation:
+  type: article
+  title: "TEEI: A cp-Invariant Multi-Dimensional Index for Comparing Fluid
+    Heating Sources Across Economic, Environmental, Thermodynamic, and
+    Temporal Dimensions"
+  authors:
+    - family-names: "[SURNAME]"
+      given-names: "[FIRST NAME]"
+  journal: "Applied Energy"
+  year: 2026
+  status: "under-review"

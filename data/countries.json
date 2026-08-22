@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "description": "Country energy price and grid CO2 intensity database",
+    "version": "0.1",
+    "updated": "2026-Q3",
+    "sources": "EMBER (CO2); Eurostat (EU prices); EIA (US); GlobalPetrolPrices (others)",
+    "note": "Residential prices. CO2 in g/kWh. Prices in EUR/kWh (USD for US).",
+    "update_cadence": "Quarterly via GitHub Actions (scripts/fetch_*.py)"
+  },
+  "countries": {
+    "ES": {"name":"Spain","electricity_price":0.190,"gas_price":0.092,"grid_co2":160,"currency":"EUR","data_year":2026},
+    "DE": {"name":"Germany","electricity_price":0.325,"gas_price":0.110,"grid_co2":350,"currency":"EUR","data_year":2026},
+    "FR": {"name":"France","electricity_price":0.200,"gas_price":0.095,"grid_co2":52,"currency":"EUR","data_year":2026},
+    "NO": {"name":"Norway","electricity_price":0.105,"gas_price":0.088,"grid_co2":28,"currency":"EUR","data_year":2026},
+    "PL": {"name":"Poland","electricity_price":0.185,"gas_price":0.075,"grid_co2":695,"currency":"EUR","data_year":2026},
+    "IT": {"name":"Italy","electricity_price":0.280,"gas_price":0.105,"grid_co2":280,"currency":"EUR","data_year":2026},
+    "NL": {"name":"Netherlands","electricity_price":0.295,"gas_price":0.115,"grid_co2":290,"currency":"EUR","data_year":2026},
+    "SE": {"name":"Sweden","electricity_price":0.135,"gas_price":0.090,"grid_co2":42,"currency":"EUR","data_year":2026},
+    "PT": {"name":"Portugal","electricity_price":0.220,"gas_price":0.095,"grid_co2":145,"currency":"EUR","data_year":2026},
+    "GB": {"name":"United Kingdom","electricity_price":0.245,"gas_price":0.100,"grid_co2":180,"currency":"GBP","data_year":2026},
+    "US": {"name":"USA (avg)","electricity_price":0.155,"gas_price":0.055,"grid_co2":370,"currency":"USD","data_year":2026},
+    "IN": {"name":"India","electricity_price":0.080,"gas_price":0.045,"grid_co2":708,"currency":"USD","data_year":2026},
+    "CN": {"name":"China","electricity_price":0.085,"gas_price":0.040,"grid_co2":530,"currency":"USD","data_year":2026},
+    "BR": {"name":"Brazil","electricity_price":0.120,"gas_price":0.060,"grid_co2":95,"currency":"USD","data_year":2026},
+    "AU": {"name":"Australia","electricity_price":0.215,"gas_price":0.058,"grid_co2":480,"currency":"AUD","data_year":2026},
+    "JP": {"name":"Japan","electricity_price":0.230,"gas_price":0.095,"grid_co2":440,"currency":"JPY_norm","data_year":2026},
+    "ZA": {"name":"South Africa","electricity_price":0.095,"gas_price":0.050,"grid_co2":750,"currency":"USD","data_year":2026},
+    "MA": {"name":"Morocco","electricity_price":0.110,"gas_price":0.065,"grid_co2":550,"currency":"USD","data_year":2026},
+    "TR": {"name":"Turkey","electricity_price":0.125,"gas_price":0.070,"grid_co2":420,"currency":"USD","data_year":2026},
+    "SA": {"name":"Saudi Arabia","electricity_price":0.048,"gas_price":0.018,"grid_co2":690,"currency":"USD","data_year":2026}
+  }
+}

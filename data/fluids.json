@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "description": "Fluid thermophysical database for TEEI framework",
+    "version": "0.1",
+    "cp_unit": "J/(kg·°C)",
+    "source": "NIST WebBook; ASHRAE; Perry's Chemical Engineers Handbook"
+  },
+  "fluids": {
+    "water": {"name":"Water","cp":4184.0,"T_min_C":0.0,"T_max_C":99.0,"T_boil_C":100.0,"density_kg_m3":998.0,"cp_variation_pct":0.9,"source":"NIST WebBook"},
+    "seawater": {"name":"Seawater (3.5% NaCl)","cp":3900.0,"T_min_C":-2.0,"T_max_C":90.0,"T_boil_C":102.0,"density_kg_m3":1025.0,"cp_variation_pct":1.5,"source":"Millero & Leung (1976)"},
+    "milk": {"name":"Whole milk","cp":3930.0,"T_min_C":4.0,"T_max_C":80.0,"T_boil_C":100.5,"density_kg_m3":1030.0,"cp_variation_pct":2.0,"source":"ASHRAE"},
+    "blood": {"name":"Human blood","cp":3617.0,"T_min_C":35.0,"T_max_C":42.0,"T_boil_C":100.0,"density_kg_m3":1060.0,"cp_variation_pct":0.5,"source":"Duck (1990)"},
+    "wort": {"name":"Brewery wort (~12 Plato)","cp":3950.0,"T_min_C":0.0,"T_max_C":99.0,"T_boil_C":100.5,"density_kg_m3":1048.0,"cp_variation_pct":2.5,"source":"Geiger (1999)"},
+    "ethanol": {"name":"Ethanol (pure)","cp":2440.0,"T_min_C":-114.0,"T_max_C":77.0,"T_boil_C":78.4,"density_kg_m3":789.0,"cp_variation_pct":4.0,"source":"NIST WebBook"},
+    "glycerol": {"name":"Glycerol (99%)","cp":2380.0,"T_min_C":18.0,"T_max_C":250.0,"T_boil_C":290.0,"density_kg_m3":1261.0,"cp_variation_pct":3.0,"source":"Perry's"},
+    "ethylene_glycol": {"name":"Ethylene glycol","cp":2380.0,"T_min_C":-13.0,"T_max_C":190.0,"T_boil_C":197.0,"density_kg_m3":1113.0,"cp_variation_pct":3.5,"source":"ASHRAE"},
+    "propylene_glycol": {"name":"Propylene glycol","cp":2500.0,"T_min_C":-60.0,"T_max_C":180.0,"T_boil_C":188.0,"density_kg_m3":1036.0,"cp_variation_pct":3.5,"source":"ASHRAE"},
+    "olive_oil": {"name":"Olive oil","cp":1970.0,"T_min_C":-6.0,"T_max_C":170.0,"T_boil_C":300.0,"density_kg_m3":900.0,"cp_variation_pct":5.0,"source":"Moura et al. (2012)"},
+    "engine_oil": {"name":"Engine oil (SAE 30)","cp":1900.0,"T_min_C":-10.0,"T_max_C":150.0,"T_boil_C":300.0,"density_kg_m3":890.0,"cp_variation_pct":5.0,"source":"Incropera et al."},
+    "molten_salt": {"name":"Molten salt (Solar Salt 60/40)","cp":1500.0,"T_min_C":220.0,"T_max_C":565.0,"T_boil_C":600.0,"density_kg_m3":1899.0,"cp_variation_pct":2.0,"source":"Bradshaw & Mehos (2000)"},
+    "mercury": {"name":"Mercury (liquid)","cp":140.0,"T_min_C":-38.8,"T_max_C":356.0,"T_boil_C":356.7,"density_kg_m3":13534.0,"cp_variation_pct":1.0,"source":"NIST WebBook"},
+    "ammonia": {"name":"Liquid ammonia","cp":4700.0,"T_min_C":-77.0,"T_max_C":-34.0,"T_boil_C":-33.4,"density_kg_m3":682.0,"cp_variation_pct":5.0,"source":"NIST WebBook"},
+    "liquid_hydrogen": {"name":"Liquid hydrogen","cp":14300.0,"T_min_C":-259.1,"T_max_C":-253.0,"T_boil_C":-252.9,"density_kg_m3":71.0,"cp_variation_pct":10.0,"source":"NIST WebBook"}
+  }
+}
