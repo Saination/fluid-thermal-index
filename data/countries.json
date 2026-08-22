@@ -1,32 +1,278 @@
 {
   "_meta": {
     "description": "Country energy price and grid CO2 intensity database",
-    "version": "0.1",
-    "updated": "2026-Q3",
-    "sources": "EMBER (CO2); Eurostat (EU prices); EIA (US); GlobalPetrolPrices (others)",
-    "note": "Residential prices. CO2 in g/kWh. Prices in EUR/kWh (USD for US).",
-    "update_cadence": "Quarterly via GitHub Actions (scripts/fetch_*.py)"
+    "version": "2026-Q3-real-v1",
+    "updated": "2026-08-23",
+    "sources": "Eurostat nrg_pc_204/nrg_pc_202 (EU prices, H2 2025); EIA Short-Term Energy Outlook (US, H2 2025); Ember Global Electricity Review 2025/2026 (grid CO2); GlobalPetrolPrices.com Q1 2026 (non-EU prices); DEFRA 2026 (UK grid CO2); EPA eGRID 2023 (US grid CO2)",
+    "note": "Residential/household prices. CO2 = grid average location-based emissions intensity, g CO2/kWh. Confidence varies by country - see per-country 'confidence' field.",
+    "confidence_legend": "high = official statistical agency figure for the exact metric; medium = derived/converted from an official figure or a consistent secondary aggregator; low = single-source estimate, needs independent verification before publication"
   },
   "countries": {
-    "ES": {"name":"Spain","electricity_price":0.190,"gas_price":0.092,"grid_co2":160,"currency":"EUR","data_year":2026},
-    "DE": {"name":"Germany","electricity_price":0.325,"gas_price":0.110,"grid_co2":350,"currency":"EUR","data_year":2026},
-    "FR": {"name":"France","electricity_price":0.200,"gas_price":0.095,"grid_co2":52,"currency":"EUR","data_year":2026},
-    "NO": {"name":"Norway","electricity_price":0.105,"gas_price":0.088,"grid_co2":28,"currency":"EUR","data_year":2026},
-    "PL": {"name":"Poland","electricity_price":0.185,"gas_price":0.075,"grid_co2":695,"currency":"EUR","data_year":2026},
-    "IT": {"name":"Italy","electricity_price":0.280,"gas_price":0.105,"grid_co2":280,"currency":"EUR","data_year":2026},
-    "NL": {"name":"Netherlands","electricity_price":0.295,"gas_price":0.115,"grid_co2":290,"currency":"EUR","data_year":2026},
-    "SE": {"name":"Sweden","electricity_price":0.135,"gas_price":0.090,"grid_co2":42,"currency":"EUR","data_year":2026},
-    "PT": {"name":"Portugal","electricity_price":0.220,"gas_price":0.095,"grid_co2":145,"currency":"EUR","data_year":2026},
-    "GB": {"name":"United Kingdom","electricity_price":0.245,"gas_price":0.100,"grid_co2":180,"currency":"GBP","data_year":2026},
-    "US": {"name":"USA (avg)","electricity_price":0.155,"gas_price":0.055,"grid_co2":370,"currency":"USD","data_year":2026},
-    "IN": {"name":"India","electricity_price":0.080,"gas_price":0.045,"grid_co2":708,"currency":"USD","data_year":2026},
-    "CN": {"name":"China","electricity_price":0.085,"gas_price":0.040,"grid_co2":530,"currency":"USD","data_year":2026},
-    "BR": {"name":"Brazil","electricity_price":0.120,"gas_price":0.060,"grid_co2":95,"currency":"USD","data_year":2026},
-    "AU": {"name":"Australia","electricity_price":0.215,"gas_price":0.058,"grid_co2":480,"currency":"AUD","data_year":2026},
-    "JP": {"name":"Japan","electricity_price":0.230,"gas_price":0.095,"grid_co2":440,"currency":"JPY_norm","data_year":2026},
-    "ZA": {"name":"South Africa","electricity_price":0.095,"gas_price":0.050,"grid_co2":750,"currency":"USD","data_year":2026},
-    "MA": {"name":"Morocco","electricity_price":0.110,"gas_price":0.065,"grid_co2":550,"currency":"USD","data_year":2026},
-    "TR": {"name":"Turkey","electricity_price":0.125,"gas_price":0.070,"grid_co2":420,"currency":"USD","data_year":2026},
-    "SA": {"name":"Saudi Arabia","electricity_price":0.048,"gas_price":0.018,"grid_co2":690,"currency":"USD","data_year":2026}
+    "ES": {
+      "name": "Spain",
+      "electricity_price": 0.310,
+      "gas_price": 0.086,
+      "grid_co2": 160,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "Statista/Eurostat household band, 2025 (approx range 0.28-0.33 EUR/kWh across bands) - RECOMMEND confirming exact nrg_pc_204 DC-band figure before publication",
+        "gas": "Eurostat nrg_pc_202 medium-household, Dec 2024, 23.83 EUR/GJ (GCV) converted at 277.778 kWh/GJ",
+        "grid_co2": "Placeholder - RECOMMEND pulling exact 2025 value from Ember Electricity Data Explorer for Spain"
+      }
+    },
+    "FR": {
+      "name": "France",
+      "electricity_price": 0.270,
+      "gas_price": 0.095,
+      "grid_co2": 52,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "Range reported 0.22-0.30 EUR/kWh depending on consumption band (Eurostat nrg_pc_204 / Statista, H1-H2 2025) - RECOMMEND confirming exact DC-band figure",
+        "gas": "Estimate - not directly retrieved; RECOMMEND pulling nrg_pc_202 France 2025 figure",
+        "grid_co2": "Ember Global Electricity Review 2025 - France nuclear-dominated grid, widely reported 40-55 gCO2/kWh range"
+      }
+    },
+    "DE": {
+      "name": "Germany",
+      "electricity_price": 0.387,
+      "gas_price": 0.120,
+      "grid_co2": 330,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "high",
+      "sources": {
+        "electricity": "Eurostat nrg_pc_204, household band DC, H2 2025: EUR 0.3869/kWh (highest in EU)",
+        "gas": "Eurostat nrg_pc_202 medium-household, Dec 2024: 33.28 EUR/GJ (GCV) converted at 277.778 kWh/GJ = 0.1198 EUR/kWh",
+        "grid_co2": "GreenCalculus 2026 reference dataset (sourced to Ember Yearly Electricity Data 2025): 0.330 kg/kWh"
+      }
+    },
+    "NO": {
+      "name": "Norway",
+      "electricity_price": 0.110,
+      "gas_price": 0.088,
+      "grid_co2": 28,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "GlobalPetrolPrices/electricitycostcalc Q1 2026: ~$0.12 USD/kWh (hydro-dominant, converted approx to EUR)",
+        "gas": "Estimate - Norway has minimal residential gas consumption (electric heating dominant); low confidence, needs direct sourcing",
+        "grid_co2": "GreenCalculus 2026 reference dataset (Ember Yearly Electricity Data 2025): 0.028 kg/kWh - ~99% hydropower"
+      }
+    },
+    "PL": {
+      "name": "Poland",
+      "electricity_price": 0.200,
+      "gas_price": 0.075,
+      "grid_co2": 650,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "low",
+      "sources": {
+        "electricity": "Eurostat H2 2025 reports Poland PPS-adjusted at 37.15 (2nd highest in EU); nominal EUR figure not directly retrieved, estimated from PPS given Poland's lower price-level index - RECOMMEND direct nrg_pc_204 lookup",
+        "gas": "Eurostat notes Poland gas price data is CONFIDENTIAL (not published) - this is an estimate only, RECOMMEND alternative source (e.g. Polish Energy Regulatory Office URE)",
+        "grid_co2": "Statista/Ember 2025: Poland highest carbon intensity in EU, >600 gCO2/kWh (coal-dominated ~70% of generation)"
+      }
+    },
+    "IT": {
+      "name": "Italy",
+      "electricity_price": 0.350,
+      "gas_price": 0.148,
+      "grid_co2": 280,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "statranker.org Sept 2025 snapshot: $0.393 USD/kWh; converted approx to EUR",
+        "gas": "Eurostat H2 2025: Italy among highest EU gas prices, EUR 0.1481/kWh (nrg_pc_202 non-household reference point, household likely similar or higher)",
+        "grid_co2": "Estimate based on gas-heavy Italian generation mix - RECOMMEND direct Ember lookup"
+      }
+    },
+    "NL": {
+      "name": "Netherlands",
+      "electricity_price": 0.295,
+      "gas_price": 0.172,
+      "grid_co2": 290,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "Estimate - not directly retrieved this session; RRECOMMEND nrg_pc_204 lookup",
+        "gas": "Eurostat H2 2025: Netherlands 2nd highest EU gas price, EUR 0.1719/kWh",
+        "grid_co2": "Estimate - RECOMMEND direct Ember lookup"
+      }
+    },
+    "SE": {
+      "name": "Sweden",
+      "electricity_price": 0.135,
+      "gas_price": 0.209,
+      "grid_co2": 42,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "Estimate - Sweden has very low electricity price due to hydro+nuclear; RECOMMEND direct nrg_pc_204 lookup",
+        "gas": "Eurostat H1 2025: Sweden highest EU gas price, EUR 0.2128/kWh (minimal gas consumption, small residential market)",
+        "grid_co2": "Estimate based on hydro+nuclear dominant mix (~98% carbon-free) - RECOMMEND direct Ember lookup"
+      }
+    },
+    "PT": {
+      "name": "Portugal",
+      "electricity_price": 0.220,
+      "gas_price": 0.119,
+      "grid_co2": 145,
+      "currency": "EUR",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "Estimate - not directly retrieved this session; RECOMMEND nrg_pc_204 lookup",
+        "gas": "Eurostat nrg_pc_202 medium-household, Dec 2024: 33.11 EUR/GJ (GCV) converted at 277.778 kWh/GJ = 0.1192 EUR/kWh",
+        "grid_co2": "Estimate - RECOMMEND direct Ember lookup"
+      }
+    },
+    "GB": {
+      "name": "United Kingdom",
+      "electricity_price": 0.310,
+      "gas_price": 0.070,
+      "grid_co2": 131,
+      "currency": "GBP",
+      "data_year": 2026,
+      "confidence": "high",
+      "sources": {
+        "electricity": "Ofgem price cap, Selectra benchmark 2026: GBP 0.27/kWh (~EUR 0.31 at typical exchange rate) - RECOMMEND using GBP directly with live FX rate",
+        "gas": "Estimate based on historical UK gas:electricity ratio (~1:4, ONS 2022 data: 30.5p elec vs 8.2p gas) - RECOMMEND direct 2025/2026 DESNZ figure",
+        "grid_co2": "DEFRA 2026 (DESNZ) grid emission factor: 0.131 kg/kWh"
+      }
+    },
+    "US": {
+      "name": "USA (avg)",
+      "electricity_price": 0.177,
+      "gas_price": 0.045,
+      "grid_co2": 384,
+      "currency": "USD",
+      "data_year": 2025,
+      "confidence": "high",
+      "sources": {
+        "electricity": "EIA data via energyfactbook.com, July-Dec 2025 average: $0.177/kWh residential",
+        "gas": "Estimate - not directly retrieved this session; RECOMMEND EIA residential natural gas price lookup",
+        "grid_co2": "Ember Global Electricity Review 2025: US carbon intensity 384 gCO2/kWh (2024 data, record low, falling from 598 in 2007). EPA eGRID 2023 national average also ~350-384 range depending on methodology"
+      }
+    },
+    "IN": {
+      "name": "India",
+      "electricity_price": 0.085,
+      "gas_price": 0.045,
+      "grid_co2": 700,
+      "currency": "USD",
+      "data_year": 2025,
+      "confidence": "low",
+      "sources": {
+        "electricity": "energtx.com regional estimate: South & SE Asia residential range 5-12 US cents/kWh, subsidized and highly state-variable in India specifically - RECOMMEND direct CEA (Central Electricity Authority, India) tariff lookup",
+        "gas": "Estimate only - India residential gas (PNG) pricing highly city-specific and largely LPG-cylinder based rather than piped gas in most areas - RECOMMEND treating with caution or excluding gas comparison for India",
+        "grid_co2": "GreenCalculus 2026 reference dataset (Ember): India ~0.670-0.708 kg/kWh (coal-dominant ~70% generation share)"
+      }
+    },
+    "CN": {
+      "name": "China",
+      "electricity_price": 0.080,
+      "gas_price": 0.040,
+      "grid_co2": 560,
+      "currency": "USD",
+      "data_year": 2025,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "Estimate - Chinese residential tariffs are regulated/tiered and vary by province; RECOMMEND direct NDRC or provincial tariff schedule",
+        "gas": "Estimate only - not directly retrieved; RECOMMEND direct source",
+        "grid_co2": "Ember Global Electricity Review 2025: China 560 gCO2/kWh (2024 data, down 4.1% from 2023, still coal-dominated ~60% generation share)"
+      }
+    },
+    "BR": {
+      "name": "Brazil",
+      "electricity_price": 0.120,
+      "gas_price": 0.060,
+      "grid_co2": 110,
+      "currency": "USD",
+      "data_year": 2025,
+      "confidence": "low",
+      "sources": {
+        "electricity": "energtx.com regional Latin America estimate: 8-18 US cents/kWh range (hydro-dominant, lowers price) - RECOMMEND direct ANEEL (Brazil regulator) tariff data",
+        "gas": "Estimate only - Brazil has limited piped residential gas infrastructure outside major cities; LPG more common - RECOMMEND treating with caution",
+        "grid_co2": "GreenCalculus 2026 reference dataset (Ember): Brazil ~0.110 kg/kWh (hydro-dominant ~60% generation share)"
+      }
+    },
+    "AU": {
+      "name": "Australia",
+      "electricity_price": 0.280,
+      "gas_price": 0.058,
+      "grid_co2": 480,
+      "currency": "USD",
+      "data_year": 2026,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "electricitycostcalc.com Q1 2026: $0.28/kWh residential (GlobalPetrolPrices basis)",
+        "gas": "Estimate only - not directly retrieved this session; RECOMMEND AER (Australian Energy Regulator) data",
+        "grid_co2": "GreenCalculus 2026 reference dataset (Ember): Australia ~0.480-0.525 kg/kWh (coal remains significant share)"
+      }
+    },
+    "MA": {
+      "name": "Morocco",
+      "electricity_price": 0.110,
+      "gas_price": 0.065,
+      "grid_co2": 550,
+      "currency": "USD",
+      "data_year": 2026,
+      "confidence": "low",
+      "sources": {
+        "electricity": "Estimate only - not directly retrieved this session; RECOMMEND ONEE (Morocco utility) tariff data",
+        "gas": "Estimate only - RECOMMEND direct source",
+        "grid_co2": "Estimate - Morocco grid remains coal/gas heavy despite growing solar capacity - RECOMMEND direct Ember lookup"
+      }
+    },
+    "TR": {
+      "name": "Turkey",
+      "electricity_price": 0.125,
+      "gas_price": 0.070,
+      "grid_co2": 420,
+      "currency": "USD",
+      "data_year": 2026,
+      "confidence": "low",
+      "sources": {
+        "electricity": "Estimate only - not directly retrieved this session; RECOMMEND EPDK (Turkey energy regulator) tariff data",
+        "gas": "Estimate only - RECOMMEND direct source",
+        "grid_co2": "Estimate - RECOMMEND direct Ember lookup"
+      }
+    },
+    "SA": {
+      "name": "Saudi Arabia",
+      "electricity_price": 0.048,
+      "gas_price": 0.018,
+      "grid_co2": 690,
+      "currency": "USD",
+      "data_year": 2026,
+      "confidence": "low",
+      "sources": {
+        "electricity": "Estimate only - Gulf states have heavily subsidized fossil-fuel-based electricity; RECOMMEND SEC (Saudi Electricity Company) tariff data",
+        "gas": "Estimate only - RECOMMEND direct source",
+        "grid_co2": "Estimate - oil/gas dominant generation mix - RECOMMEND direct Ember lookup"
+      }
+    },
+    "ZA": {
+      "name": "South Africa",
+      "electricity_price": 0.095,
+      "gas_price": 0.050,
+      "grid_co2": 750,
+      "currency": "USD",
+      "data_year": 2026,
+      "confidence": "medium",
+      "sources": {
+        "electricity": "Estimate only - not directly retrieved this session; RECOMMEND Eskom tariff data",
+        "gas": "Estimate only - South Africa has minimal residential piped gas infrastructure; LPG more common",
+        "grid_co2": "GreenCalculus 2026 reference dataset (Ember): South Africa ~0.699-0.750 kg/kWh (~80% coal generation) - among highest in dataset"
+      }
+    }
   }
 }

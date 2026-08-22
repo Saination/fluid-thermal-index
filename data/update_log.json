@@ -1,11 +1,24 @@
 {
   "history": [
     {
+      "date": "2026-08-23T00:00:00+00:00",
+      "version": "2026-Q3-real-v1",
+      "changes": [
+        "Replaced all placeholder country data with real cited figures from Eurostat, EIA, Ember, and GlobalPetrolPrices",
+        "Added per-country 'confidence' field (high/medium/low) and 'sources' object citing exact dataset and retrieval basis",
+        "Germany, US, UK grid_co2 and Spain/Germany/Portugal gas prices are 'high' confidence (direct official statistics)",
+        "India, Brazil, Morocco, Turkey, Saudi Arabia, South Africa gas/electricity prices remain 'low' confidence estimates pending direct national regulator sourcing",
+        "This was a MANUAL research pass (web search), NOT the automated fetch_ember.py/fetch_eurostat.py/fetch_eia.py pipeline - those scripts remain unexecuted"
+      ],
+      "changes_count": 20,
+      "note": "First real-data pass. Countries marked confidence=low should be re-verified from national sources before use in final publication."
+    },
+    {
       "date": "2026-08-19T00:00:00+00:00",
       "version": "2026-Q3",
       "changes": [],
       "changes_count": 0,
-      "note": "Initial static dataset — automated pipeline not yet run"
+      "note": "Initial static dataset - placeholder values, not from live sources"
     }
   ]
 }

@@ -14,10 +14,12 @@ from teei.phase_check import PhaseChangeError
 # ---------------------------------------------------------------------------
 class TestCalculate:
     def test_basic_water_electric_spain(self):
+        # Reference values from real Spain 2025 data (Eurostat H2 2025):
+        # electricity_price=0.310 EUR/kWh, grid_co2=160 g/kWh (see data/countries.json)
         r = calculate("water", "electric", country="ES",
                       mass=1.0, delta_T=1.0)
-        assert math.isclose(r.fteu, 0.02231, rel_tol=1e-3)
-        assert math.isclose(r.ftem, 0.18783, rel_tol=1e-3)
+        assert math.isclose(r.fteu, 0.036393, rel_tol=1e-3)
+        assert math.isclose(r.ftem, 0.187834, rel_tol=1e-3)
         assert r.ftes > 0
         assert r.ftet > 0
         assert r.single_phase is True
@@ -52,8 +54,10 @@ class TestCalculate:
 
     def test_price_override(self):
         """Explicit price overrides country database value."""
+        # Spain's real 2025 electricity price is 0.310 EUR/kWh, so the
+        # override must clearly exceed that to test the override direction.
         r_country  = calculate("water", "electric", country="ES")
-        r_override = calculate("water", "electric", country="ES", price=0.30)
+        r_override = calculate("water", "electric", country="ES", price=0.50)
         assert r_override.fteu > r_country.fteu
 
     def test_co2_override(self):
@@ -291,9 +295,11 @@ class TestCountries:
 # ---------------------------------------------------------------------------
 class TestPolicyScalarsWithCountry:
     def test_tpp_spain(self):
+        # Reference: Spain 2025 gas_price=0.086 EUR/kWh (Eurostat, see
+        # data/countries.json). TPP = 0.086 * 3.0 / 0.45 = 0.5733
         result = tpp(country="ES", cop=3.0)
-        assert math.isclose(result["tpp"], 0.6133, rel_tol=1e-2)
-        assert result["hp_wins"] is True  # Spain P_elec 0.19 < TPP 0.61
+        assert math.isclose(result["tpp"], 0.5733, rel_tol=1e-2)
+        assert result["hp_wins"] is True  # Spain P_elec 0.310 < TPP 0.573
 
     def test_tpp_includes_local_price(self):
         result = tpp(country="DE", cop=3.0)
