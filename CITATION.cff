@@ -22,18 +22,20 @@ keywords:
   - TEEI
   - entropy generation
 authors:
-  - family-names: "[SURNAME]"
-    given-names: "[FIRST NAME]"
-    affiliation: "[INSTITUTION]"
-    orcid: "https://orcid.org/[ORCID-ID]"
+  - family-names: "[Waghmare]"
+    given-names: "[Sainath Arjun]"
+    affiliation: "[Universitat de les Illes Balears]"
+    orcid: "https://orcid.org/[0000-0001-9534-1227]"
 preferred-citation:
   type: article
   title: "TEEI: A cp-Invariant Multi-Dimensional Index for Comparing Fluid
     Heating Sources Across Economic, Environmental, Thermodynamic, and
     Temporal Dimensions"
   authors:
-    - family-names: "[SURNAME]"
-      given-names: "[FIRST NAME]"
-  journal: "Applied Energy"
+    - family-names: "[Cardona]"
+      given-names: "[Gabriel]"
+    - family-names: "[Pujol-Nadal]"
+      given-names: "[Ramón]"
+  journal: ""
   year: 2026
   status: "under-review"
