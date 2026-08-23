@@ -143,11 +143,20 @@ def calculate(
     src_id = src["id"]
 
     # 3. Resolve energy price and CO₂
+    # When the source itself carries its own price/co2 (e.g. a custom dict, or
+    # the database default for a named source) and no country and no explicit
+    # override is given, that source-level value is the correct fallback —
+    # NOT resolve_energy_params' generic 0.190 default. This matters for
+    # standalone custom-source testing (country=None), such as adversarial
+    # sensitivity analysis with hand-built price/CO2 scenarios.
+    fallback_price = src.get("price") if country is None and price is None else None
+    fallback_co2 = src.get("co2_intensity") if country is None and co2 is None else None
+
     energy = resolve_energy_params(
         country_code=country,
         source_co2_type=src["co2_type"],
-        override_price=price,
-        override_co2=co2,
+        override_price=price if price is not None else fallback_price,
+        override_co2=co2 if co2 is not None else fallback_co2,
     )
     resolved_price = energy["price"]
     resolved_co2 = energy["co2"]

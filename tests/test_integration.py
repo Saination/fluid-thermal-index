@@ -52,6 +52,26 @@ class TestCalculate:
         r = calculate("water", custom, mass=1.0, delta_T=1.0)
         assert r.ftes_model == "B"
 
+    def test_custom_source_dict_price_used_when_no_country(self):
+        """
+        Regression test: a custom source dict's own 'price' and
+        'co2_intensity' must be honoured when country=None and no
+        explicit price/co2 override is passed to calculate() — this
+        was previously silently overridden by a hardcoded 0.190
+        fallback in resolve_energy_params, discovered during
+        adversarial sensitivity-analysis testing.
+        """
+        custom = {"efficiency": 2.0, "price": 0.45, "co2_intensity": 900.0}
+        r = calculate("water", custom, mass=1.0, delta_T=1.0, check_phase=False)
+        expected_fteu = (0.45 / 2.0) * (4184.0 / 36_000.0)
+        assert math.isclose(r.fteu, expected_fteu, rel_tol=1e-9), (
+            f"Custom dict price=0.45 was not honoured — got fteu={r.fteu}, "
+            f"expected={expected_fteu}. This indicates the 0.190 hardcoded "
+            f"fallback bug has regressed."
+        )
+        expected_ftem = (900.0 / 2.0) * (4184.0 / 3_600_000.0)
+        assert math.isclose(r.ftem, expected_ftem, rel_tol=1e-9)
+
     def test_price_override(self):
         """Explicit price overrides country database value."""
         # Spain's real 2025 electricity price is 0.310 EUR/kWh, so the
